@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>To-Do List</title>
+    <title>Enhanced To-Do List</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,37 +12,41 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f4f4f4;
+            background-color: #f0f2f5;
         }
 
         .container {
             background: white;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
             text-align: center;
         }
 
         h1 {
             margin-bottom: 20px;
+            color: #333;
         }
 
         form {
             display: flex;
             gap: 10px;
+            margin-bottom: 20px;
         }
 
         input {
             flex: 1;
             padding: 10px;
             font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
 
         button {
-            padding: 10px;
+            padding: 10px 20px;
             font-size: 16px;
-            background-color: #28a745;
+            background-color: #007bff;
             color: white;
             border: none;
             border-radius: 4px;
@@ -50,26 +54,31 @@
         }
 
         button:hover {
-            background-color: #218838;
+            background-color: #0056b3;
         }
 
         ul {
             list-style: none;
             padding: 0;
-            margin-top: 20px;
         }
 
         li {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #f4f4f4;
+            background: #fff;
             padding: 10px;
             border-bottom: 1px solid #ddd;
+            transition: background 0.3s;
         }
 
-        li:nth-child(even) {
-            background: #e9e9e9;
+        li.completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        li:hover {
+            background: #f9f9f9;
         }
 
         li button {
@@ -81,6 +90,37 @@
 
         li button:hover {
             text-decoration: underline;
+        }
+
+        .edit-input {
+            flex: 1;
+            padding: 5px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .complete-button {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .complete-button:hover {
+            background-color: #218838;
+        }
+
+        .edit-button {
+            background-color: #ffc107;
+            color: white;
+        }
+
+        .edit-button:hover {
+            background-color: #e0a800;
         }
     </style>
 </head>
@@ -99,28 +139,97 @@
             const todoInput = document.getElementById('todo-input');
             const todoList = document.getElementById('todo-list');
 
+            // Load saved tasks from local storage
+            const savedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            savedTasks.forEach(task => addTask(task.text, task.completed));
+
             todoForm.addEventListener('submit', (e) => {
                 e.preventDefault();
 
                 const taskText = todoInput.value.trim();
                 if (taskText !== '') {
                     addTask(taskText);
+                    saveTasks();
                     todoInput.value = '';
                 }
             });
 
-            function addTask(taskText) {
+            function addTask(taskText, completed = false) {
                 const li = document.createElement('li');
-                li.textContent = taskText;
+                li.className = completed ? 'completed' : '';
 
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Delete';
-                deleteButton.addEventListener('click', () => {
-                    todoList.removeChild(li);
+                const taskTextElement = document.createElement('span');
+                taskTextElement.textContent = taskText;
+                taskTextElement.addEventListener('dblclick', () => {
+                    editTask(taskTextElement);
                 });
 
-                li.appendChild(deleteButton);
+                const actions = document.createElement('div');
+                actions.className = 'actions';
+
+                const completeButton = document.createElement('button');
+                completeButton.textContent = '✔';
+                completeButton.className = 'complete-button';
+                completeButton.addEventListener('click', () => {
+                    li.classList.toggle('completed');
+                    saveTasks();
+                });
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = '✖';
+                deleteButton.addEventListener('click', () => {
+                    todoList.removeChild(li);
+                    saveTasks();
+                });
+
+                const editButton = document.createElement('button');
+                editButton.textContent = '✎';
+                editButton.className = 'edit-button';
+                editButton.addEventListener('click', () => {
+                    editTask(taskTextElement);
+                });
+
+                actions.appendChild(completeButton);
+                actions.appendChild(editButton);
+                actions.appendChild(deleteButton);
+
+                li.appendChild(taskTextElement);
+                li.appendChild(actions);
                 todoList.appendChild(li);
+            }
+
+            function editTask(taskTextElement) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = taskTextElement.textContent;
+                input.className = 'edit-input';
+                taskTextElement.replaceWith(input);
+                input.focus();
+
+                input.addEventListener('blur', () => {
+                    taskTextElement.textContent = input.value;
+                    input.replaceWith(taskTextElement);
+                    saveTasks();
+                });
+
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        taskTextElement.textContent = input.value;
+                        input.replaceWith(taskTextElement);
+                        saveTasks();
+                    }
+                });
+            }
+
+            function saveTasks() {
+                const tasks = [];
+                document.querySelectorAll('#todo-list li').forEach(li => {
+                    tasks.push({
+                        text: li.querySelector('span').textContent,
+                        completed: li.classList.contains('completed')
+                    });
+                });
+                localStorage.setItem('tasks', JSON.stringify(tasks));
             }
         });
     </script>
