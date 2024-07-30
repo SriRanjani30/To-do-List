@@ -58,23 +58,36 @@
             background-color: #0056b3;
         }
 
-        .filter {
+        .filter, .search {
             margin: 20px 0;
         }
 
-        .filter button {
+        .filter button, .search button {
             margin: 0 5px;
             background-color: #6c757d;
             color: white;
         }
 
-        .filter button.active {
+        .filter button.active, .search button.active {
             background-color: #007bff;
+        }
+
+        .ul-container {
+            position: relative;
+        }
+
+        .search input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
         }
 
         ul {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
 
         li {
@@ -90,6 +103,14 @@
         li.completed {
             text-decoration: line-through;
             color: #888;
+        }
+
+        li.due-soon {
+            background-color: #fff3cd;
+        }
+
+        li.due-past {
+            background-color: #f8d7da;
         }
 
         li:hover {
@@ -173,12 +194,17 @@
             <input type="date" id="due-date">
             <button type="submit">Add Task</button>
         </form>
+        <div class="search">
+            <input type="text" id="search-input" placeholder="Search tasks...">
+        </div>
         <div class="filter">
             <button class="filter-button active" data-filter="all">All</button>
             <button class="filter-button" data-filter="active">Active</button>
             <button class="filter-button" data-filter="completed">Completed</button>
         </div>
-        <ul id="todo-list"></ul>
+        <div class="ul-container">
+            <ul id="todo-list"></ul>
+        </div>
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -188,6 +214,7 @@
             const dueDateInput = document.getElementById('due-date');
             const todoList = document.getElementById('todo-list');
             const filterButtons = document.querySelectorAll('.filter-button');
+            const searchInput = document.getElementById('search-input');
             const savedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
             savedTasks.forEach(task => addTask(task.text, task.completed, task.priority, task.dueDate));
 
@@ -206,6 +233,10 @@
                 }
             });
 
+            searchInput.addEventListener('input', () => {
+                filterTasksBySearch(searchInput.value.toLowerCase());
+            });
+
             function addTask(taskText, completed = false, priority = 'low', dueDate = '') {
                 const li = document.createElement('li');
                 li.className = completed ? 'completed' : '';
@@ -213,7 +244,7 @@
                 const taskTextElement = document.createElement('span');
                 taskTextElement.textContent = taskText;
                 taskTextElement.addEventListener('dblclick', () => {
-                    editTask(taskTextElement);
+                    editTask(taskTextElement, priority, dueDate);
                 });
 
                 const priorityLabel = document.createElement('span');
@@ -245,7 +276,7 @@
                 editButton.textContent = '✎';
                 editButton.className = 'edit-button';
                 editButton.addEventListener('click', () => {
-                    editTask(taskTextElement);
+                    editTask(taskTextElement, priority, dueDate);
                 });
 
                 actions.appendChild(completeButton);
@@ -256,30 +287,86 @@
                 li.appendChild(taskTextElement);
                 li.appendChild(dueDateLabel);
                 li.appendChild(actions);
+
+                updateDueDateHighlight(li, dueDate);
                 todoList.appendChild(li);
             }
 
-            function editTask(taskTextElement) {
+            function editTask(taskTextElement, priority, dueDate) {
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.value = taskTextElement.textContent;
                 input.className = 'edit-input';
-                taskTextElement.replaceWith(input);
+
+                const prioritySelect = document.createElement('select');
+                prioritySelect.id = 'edit-priority-select';
+                ['low', 'medium', 'high'].forEach(p => {
+                    const option = document.createElement('option');
+                    option.value = p;
+                    option.textContent = p.charAt(0).toUpperCase() + p.slice(1);
+                    if (p === priority) option.selected = true;
+                    prioritySelect.appendChild(option);
+                });
+
+                const dueDateInput = document.createElement('input');
+                dueDateInput.type = 'date';
+                dueDateInput.value = dueDate;
+
+                const container = document.createElement('div');
+                container.appendChild(input);
+                container.appendChild(prioritySelect);
+                container.appendChild(dueDateInput);
+
+                taskTextElement.replaceWith(container);
                 input.focus();
 
                 input.addEventListener('blur', () => {
-                    taskTextElement.textContent = input.value;
-                    input.replaceWith(taskTextElement);
-                    saveTasks();
+                    saveTaskEdits(container, taskTextElement);
                 });
 
                 input.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') {
-                        taskTextElement.textContent = input.value;
-                        input.replaceWith(taskTextElement);
-                        saveTasks();
+                        saveTaskEdits(container, taskTextElement);
                     }
                 });
+            }
+
+            function saveTaskEdits(container, taskTextElement) {
+                const input = container.querySelector('input[type="text"]');
+                const prioritySelect = container.querySelector('select');
+                const dueDateInput = container.querySelector('input[type="date"]');
+
+                const taskText = input.value;
+                const priority = prioritySelect.value;
+                const dueDate = dueDateInput.value;
+
+                taskTextElement.textContent = taskText;
+                taskTextElement.className = `priority-${priority}`;
+                taskTextElement.parentElement.querySelector('.priority-high')?.classList.remove('priority-high');
+                taskTextElement.parentElement.querySelector('.priority-medium')?.classList.remove('priority-medium');
+                taskTextElement.parentElement.querySelector('.priority-low')?.classList.remove('priority-low');
+                taskTextElement.parentElement.querySelector('.priority-high')?.classList.add(`priority-${priority}`);
+                
+                const dueDateLabel = taskTextElement.parentElement.querySelector('span:nth-of-type(3)');
+                if (dueDate) {
+                    dueDateLabel.textContent = `Due: ${new Date(dueDate).toLocaleDateString()}`;
+                    updateDueDateHighlight(taskTextElement.parentElement, dueDate);
+                } else {
+                    dueDateLabel.textContent = '';
+                }
+
+                container.replaceWith(taskTextElement);
+                saveTasks();
+            }
+
+            function updateDueDateHighlight(li, dueDate) {
+                const today = new Date();
+                const due = new Date(dueDate);
+                if (due < today) {
+                    li.classList.add('due-past');
+                } else if ((due - today) <= (3 * 24 * 60 * 60 * 1000)) {
+                    li.classList.add('due-soon');
+                }
             }
 
             function saveTasks() {
@@ -320,6 +407,14 @@
                             item.style.display = item.classList.contains('completed') ? '' : 'none';
                             break;
                     }
+                });
+            }
+
+            function filterTasksBySearch(searchText) {
+                const items = todoList.querySelectorAll('li');
+                items.forEach(item => {
+                    const text = item.querySelector('span').textContent.toLowerCase();
+                    item.style.display = text.includes(searchText) ? '' : 'none';
                 });
             }
         });
