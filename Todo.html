@@ -6,264 +6,270 @@
     <title>Advanced To-Do List</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f5f7fa;
-            transition: background-color 0.3s;
-        }
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-image: url('Images/Background.jpg'); 
+    background-size: cover;
+    background-position: center;
+    transition: background-color 0.3s;
+}
 
-        body.dark-mode {
-            background-color: #2d2d2d;
-        }
+body.dark-mode {
+    background-color: #2d2d2d;
+    background-image: none;
+}
 
-        .container {
-            background: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
-            padding: 20px;
-            text-align: center;
-            transition: background 0.3s, color 0.3s;
-        }
+.container {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
+    text-align: center;
+    transition: background 0.3s, color 0.3s;
+}
 
-        body.dark-mode .container {
-            background: #3c3c3c;
-            color: #ffffff;
-        }
+body.dark-mode .container {
+    background: #3c3c3c;
+    color: #ffffff;
+}
 
-        h1 {
-            margin-bottom: 20px;
-            color: #333;
-        }
+h1 {
+    margin-bottom: 20px;
+    color: #333;
+}
 
-        body.dark-mode h1 {
-            color: #ffffff;
-        }
+body.dark-mode h1 {
+    color: #ffffff;
+}
 
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
 
-        input[type="text"], input[type="date"], select {
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            width: 100%;
-            transition: border-color 0.3s;
-        }
+input[type="text"], input[type="date"], select {
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
 
-        body.dark-mode input[type="text"], body.dark-mode input[type="date"], body.dark-mode select {
-            border-color: #666;
-            background-color: #4a4a4a;
-            color: #ffffff;
-        }
+body.dark-mode input[type="text"], body.dark-mode input[type="date"], body.dark-mode select {
+    border-color: #666;
+    background-color: #4a4a4a;
+    color: #ffffff;
+}
 
-        button {
-            padding: 10px;
-            font-size: 16px;
-            background-color: #007bff;
-            color: #ffffff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-            transition: background-color 0.3s;
-        }
+button {
+    padding: 12px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s;
+}
 
-        button:hover {
-            background-color: #0056b3;
-        }
+button:hover {
+    background-color: #0056b3;
+}
 
-        .dark-mode button {
-            background-color: #333;
-        }
+body.dark-mode button {
+    background-color: #333;
+}
 
-        .dark-mode button:hover {
-            background-color: #555;
-        }
+body.dark-mode button:hover {
+    background-color: #555;
+}
 
-        .search {
-            margin: 10px 0;
-        }
+.search {
+    margin: 10px 0;
+}
 
-        .search input {
-            padding: 10px;
-            width: 100%;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
+.search input {
+    padding: 12px;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
 
-        .filter {
-            margin: 20px 0;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
+.filter {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
 
-        .filter button {
-            padding: 10px;
-            font-size: 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            background-color: #6c757d;
-            color: #ffffff;
-            transition: background-color 0.3s;
-        }
+.filter button {
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #6c757d;
+    color: #ffffff;
+    transition: background-color 0.3s;
+}
 
-        .filter button.active {
-            background-color: #007bff;
-        }
+.filter button.active {
+    background-color: #007bff;
+}
 
-        .filter button:hover {
-            background-color: #5a6268;
-        }
+.filter button:hover {
+    background-color: #5a6268;
+}
 
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
 
-        li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #ffffff;
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            transition: background 0.3s, transform 0.3s;
-            cursor: pointer;
-            position: relative;
-        }
+li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    transition: background 0.3s, transform 0.3s;
+    cursor: pointer;
+    position: relative;
+}
 
-        li:hover {
-            background: #f9f9f9;
-            transform: translateY(-2px);
-        }
+li:hover {
+    background: #f9f9f9;
+    transform: translateY(-2px);
+}
 
-        li.completed {
-            text-decoration: line-through;
-            color: #888;
-        }
+li.completed {
+    text-decoration: line-through;
+    color: #888;
+}
 
-        li.due-past {
-            border-left: 4px solid #dc3545;
-        }
+li.due-past {
+    border-left: 4px solid #dc3545;
+}
 
-        li.due-soon {
-            border-left: 4px solid #ffc107;
-        }
+li.due-soon {
+    border-left: 4px solid #ffc107;
+}
 
-        li .details {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            background: #f9f9f9;
-            border-top: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 0 0 4px 4px;
-        }
+li .details {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #f9f9f9;
+    border-top: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 0 0 4px 4px;
+}
 
-        li.expanded .details {
-            display: block;
-        }
+li.expanded .details {
+    display: block;
+}
 
-        li button {
-            background: none;
-            border: none;
-            color: red;
-            cursor: pointer;
-        }
+li button {
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+}
 
-        li button:hover {
-            text-decoration: underline;
-        }
+li button:hover {
+    text-decoration: underline;
+}
 
-        .edit-input {
-            flex: 1;
-            padding: 5px;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
+.edit-input {
+    flex: 1;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
 
-        .actions {
-            display: flex;
-            gap: 5px;
-        }
+.actions {
+    display: flex;
+    gap: 5px;
+}
 
-        .complete-button {
-            background-color: #28a745;
-            color: white;
-        }
+.complete-button {
+    background-color: #28a745;
+    color: white;
+}
 
-        .complete-button:hover {
-            background-color: #218838;
-        }
+.complete-button:hover {
+    background-color: #218838;
+}
 
-        .edit-button {
-            background-color: #ffc107;
-            color: white;
-        }
+.edit-button {
+    background-color: #ffc107;
+    color: white;
+}
 
-        .edit-button:hover {
-            background-color: #e0a800;
-        }
+.edit-button:hover {
+    background-color: #e0a800;
+}
 
-        .priority-high {
-            background-color: #dc3545;
-            color: white;
-            padding: 2px 5px;
-            border-radius: 4px;
-        }
+.priority-high {
+    background-color: #dc3545;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
 
-        .priority-medium {
-            background-color: #ffc107;
-            color: white;
-            padding: 2px 5px;
-            border-radius: 4px;
-        }
+.priority-medium {
+    background-color: #ffc107;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
 
-        .priority-low {
-            background-color: #28a745;
-            color: white;
-            padding: 2px 5px;
-            border-radius: 4px;
-        }
+.priority-low {
+    background-color: #28a745;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
 
-        .dark-mode .priority-high {
-            background-color: #c82333;
-        }
+body.dark-mode .priority-high {
+    background-color: #c82333;
+}
 
-        .dark-mode .priority-medium {
-            background-color: #e0a800;
-        }
+body.dark-mode .priority-medium {
+    background-color: #e0a800;
+}
 
-        .dark-mode .priority-low {
-            background-color: #218838;
-        }
+body.dark-mode .priority-low {
+    background-color: #218838;
+}
 
-        .dark-mode li {
-            background: #4a4a4a;
-            border-bottom: 1px solid #666;
-        }
+body.dark-mode li {
+    background: #4a4a4a;
+    border-bottom: 1px solid #666;
+}
 
-        .dark-mode li:hover {
-            background: #6c6c6c;
-        }
+body.dark-mode li:hover {
+    background: #6c6c6c;
+}
+
     </style>
 </head>
 <body>
